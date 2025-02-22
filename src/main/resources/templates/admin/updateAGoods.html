@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>修改商品</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<style>
+		.container {
+			max-width: 70%;
+			margin-top: 50px;
+		}
+		.header-title {
+			background-color: #007bff;
+			color: white;
+			padding: 10px 0;
+			text-align: center;
+			border-radius: 5px;
+			font-size: 1.5rem;
+		}
+		.form-group {
+			margin-bottom: 20px;
+		}
+		.form-control, .btn {
+			height: 45px;
+			font-size: 1rem;
+		}
+		.btn-primary, .btn-success {
+			width: 100px;
+		}
+		.form-control-file {
+			padding: 5px;
+		}
+		.image-preview {
+			display: block;
+			height: 50px;
+			max-width: 200px;
+			max-height: 200px;
+			margin-top: 10px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+		}
+
+		.custom-upload-btn {
+			display: inline-block;
+			background-color: #007bff;
+			color: white;
+			padding: 10px 20px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		#fileUpload {
+			display: none;
+		}
+		#imagePreview {
+			margin-top: 15px;
+			max-width: 200px;
+			max-height: 200px;
+		}
+	</style>
+</head>
+<body>
+<div th:include="admin/header"></div>
+<div class="container">
+	<div class="header-title">修改商品</div>
+	<form th:action="@{/goods/addGoods?act=update}" name="myform" method="post" th:object="${goods}" class="form-horizontal" enctype="multipart/form-data">
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品名称</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" placeholder="请输入商品名" th:field="*{gname}"/>
+				<input type="hidden" name="id" th:value="${goods.id}"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品原价</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" placeholder="请输入商品原价" th:field="*{goprice}"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品折扣价</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" placeholder="请输入商品折扣价" th:field="*{grprice}"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品库存</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" placeholder="请输入商品库存" th:field="*{gstore}"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品图片</label>
+			<div class="col-sm-10">
+				<span class="custom-upload-btn" onclick="document.getElementById('fileUpload').click()">选择图片</span>
+				<input type="file" id="fileUpload" name="fileName" accept="image/*"/>
+				<img id="imagePreview" src="#" alt="商品图片预览" style="display: none;"/>
+				<img th:src="${goods.gpicture}" class="image-preview" id="oldImage">
+				<input type="hidden" th:field="*{gpicture}" id="imageUrl"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 control-label">商品类型</label>
+			<div class="col-sm-10">
+				<select class="form-control" th:field="*{goodstype_id}">
+					<option th:each="gty:${goodsType}" th:value="${gty.id}" th:text="${gty.typename}">
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10 text-right">
+				<button type="submit" class="btn btn-success">修改</button>
+				<button type="reset" class="btn btn-primary">重置</button>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script type="text/javascript" th:inline="javascript">
+	$(document).ready(function() {
+		$('#fileUpload').change(function()
+		{
+			var formData = new FormData();
+			formData.append("file", this.files[0]);
+
+			$.ajax({
+				url: [[@{/common/upload}]],
+			type: "POST",
+					data: formData,
+				processData: false,
+				contentType: false,
+				success: function(response)
+		{
+			if (response.code === 200)
+			{
+				//隐藏原来的图片
+				$('#oldImage').hide();
+				// 显示预览图片
+				$('#imagePreview').attr("src", response.url).show();
+				$('#imageUrl').val(response.url);
+			} else {
+				alert("图片上传失败: " + response.message);
+			}
+		},
+			error: function(xhr, status, error) {
+				alert("上传过程中出错，请稍后重试。");
+			}
+		});
+		});
+	});
+</script>
+</html>

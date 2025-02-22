@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>注册页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<script src="js/jquery.min.js"></script>
+	<script src="js/common.js"></script>
+	<style>
+		body {
+			background-color: #f5f5f5;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			margin: 0;
+		}
+
+		.container {
+			background-color: white;
+			padding: 30px;
+			border-radius: 8px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			max-width: 500px;
+			width: 100%;
+		}
+
+		.form-title {
+			text-align: center;
+			margin-bottom: 20px;
+			color: #007bff;
+		}
+
+		.form-group span {
+			font-size: 12px;
+			color: red;
+		}
+
+		.btn-success,
+		.btn-primary {
+			width: 100px;
+		}
+
+		#isExit {
+			font-size: 16px;
+			padding-left: 10px;
+		}
+
+		.error-tip {
+			color: red;
+			font-size: 12px;
+			display: none;
+			margin-top: 5px;
+		}
+
+		.success-tip {
+			color: green;
+			font-size: 12px;
+			display: none;
+			margin-top: 5px;
+		}
+	</style>
+	<script type="text/javascript" th:inline="javascript">
+		function checkEmail() {
+			var email = $("#username").val();
+			if (!email) {
+				$("#emailError").text("请输入邮箱！").show();
+				$("#emailSuccess").hide();
+				return false;
+			}
+
+			// 邮箱格式验证
+			var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(email)) {
+				$("#emailError").text("请输入有效的邮箱格式！").show();
+				$("#emailSuccess").hide();
+				return false;
+			}
+
+			// 检查邮箱是否已存在
+			var isValid = false;
+			$.ajax({
+				url: [[@{/user/isUse}]],
+				type: "POST",
+				contentType: "application/json",
+				data: JSON.stringify({
+					username: email
+				}),
+				async: false,  // 使用同步请求确保返回正确的验证结果
+				success: function (response) {
+					if (response === "no") {
+						$("#emailError").text("该邮箱已被注册！").show();
+						$("#emailSuccess").hide();
+						isValid = false;
+					} else {
+						$("#emailError").hide();
+						$("#emailSuccess").text("邮箱可用").show();
+						isValid = true;
+					}
+				},
+				error: function () {
+					$("#emailError").text("验证失败，请稍后重试").show();
+					$("#emailSuccess").hide();
+					isValid = false;
+				}
+			});
+			return isValid;
+		}
+
+		// 密码验证
+		function checkPassword() {
+			var password = $("#password").val();
+			var confirmPassword = $("#confirmPassword").val();
+
+			if (!password) {
+				$("#passwordError").text("请输入密码！").show();
+				return false;
+			}
+
+			if (password.length < 6) {
+				$("#passwordError").text("密码长度至少6位！").show();
+				return false;
+			}
+
+			$("#passwordError").hide();
+
+			// 如果确认密码已填写，检查是否一致
+			if (confirmPassword) {
+				return checkConfirmPassword();
+			}
+			return true;
+		}
+
+		// 确认密码验证
+		function checkConfirmPassword() {
+			var password = $("#password").val();
+			var confirmPassword = $("#confirmPassword").val();
+
+			if (!confirmPassword) {
+				$("#confirmPasswordError").text("请确认密码！").show();
+				return false;
+			}
+
+			if (password !== confirmPassword) {
+				$("#confirmPasswordError").text("两次密码不一致！").show();
+				return false;
+			}
+
+			$("#confirmPasswordError").hide();
+			return true;
+		}
+
+		// 表单提交前验证
+		function validateForm() {
+			var isEmailValid = checkEmail();
+			var isPasswordValid = checkPassword();
+			var isConfirmPasswordValid = checkConfirmPassword();
+
+			if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+				return false;
+			}
+
+			// 验证通过，表单提交前将确认密码字段移除
+			$("#confirmPassword").remove();
+			return true;
+		}
+	</script>
+</head>
+
+<body>
+	<div class="container">
+		<h3 class="form-title">用户注册</h3>
+		<form action="user/register" name="myform" method="post" th:object="${bUser}" class="form-horizontal"
+			role="form" onsubmit="return validateForm()">
+			<div class="form-group">
+				<label class="control-label">邮箱</label>
+				<div>
+					<input type="email" id="username" class="form-control" placeholder="请输入您的邮箱" th:field="*{username}"
+						onblur="checkEmail()" />
+					<div id="emailError" class="error-tip"></div>
+					<div id="emailSuccess" class="success-tip"></div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">密码</label>
+				<div>
+					<input type="password" id="password" class="form-control" placeholder="请输入密码（至少6位）"
+						th:field="*{password}" onblur="checkPassword()" />
+					<div id="passwordError" class="error-tip"></div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">确认密码</label>
+				<div>
+					<input type="password" id="confirmPassword" class="form-control" placeholder="请再次输入密码"
+						onblur="checkConfirmPassword()" />
+					<div id="confirmPasswordError" class="error-tip"></div>
+				</div>
+			</div>
+
+			<div class="form-group text-center">
+				<button type="submit" class="btn btn-success">注册</button>
+				<button type="reset" class="btn btn-primary">重置</button>
+			</div>
+		</form>
+	</div>
+</body>
+
+</html>

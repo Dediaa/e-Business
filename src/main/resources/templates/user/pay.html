@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>支付页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+	<script src="js/jquery.min.js"></script>
+	<style>
+		.success-container {
+			max-width: 600px;
+			margin: 100px auto;
+			text-align: center;
+			padding: 40px;
+			background: #fff;
+			border-radius: 10px;
+			box-shadow: 0 0 20px rgba(0,0,0,0.1);
+		}
+
+		.success-icon {
+			color: #28a745;
+			font-size: 60px;
+			margin-bottom: 20px;
+		}
+
+		.order-id {
+			font-size: 24px;
+			color: #dc3545;
+			font-weight: bold;
+			margin: 20px 0;
+		}
+
+		.pay-button {
+			display: inline-block;
+			padding: 12px 40px;
+			background: #007bff;
+			color: white;
+			border-radius: 30px;
+			text-decoration: none;
+			font-size: 18px;
+			transition: all 0.3s ease;
+		}
+
+		.pay-button:hover {
+			background: #0056b3;
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+			text-decoration: none;
+			color: white;
+		}
+
+		.loading {
+			display: none;
+			margin-left: 10px;
+		}
+	</style>
+	<script type="text/javascript" th:inline="javascript">
+		function pay(){
+			const payBtn = $('.pay-button');
+			const loadingSpinner = $('.loading');
+
+			payBtn.prop('disabled', true);
+			loadingSpinner.show();
+
+			$.ajax({
+				url : [[@{/cart/pay}]],
+			type : "post",
+					contentType : "application/json",
+					data : JSON.stringify({
+				id : $("#oid").text()
+			}),
+					success : function(obj){
+				loadingSpinner.hide();
+				Swal.fire({
+					icon: 'success',
+					title: '支付成功',
+					showConfirmButton: false,
+					timer: 1500
+				}).then(() => {
+					var pathName = window.document.location.pathname;
+					var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+					window.location.href = projectName;
+				});
+			},
+			error : function() {
+				loadingSpinner.hide();
+				payBtn.prop('disabled', false);
+				Swal.fire({
+					icon: 'error',
+					title: '支付失败',
+					text: '处理异常，请稍后重试'
+				});
+			}
+		});
+		}
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-light">
+<div class="container">
+	<div class="success-container">
+		<i class="fas fa-check-circle success-icon"></i>
+		<h2>订单提交成功</h2>
+		<p>您的订单编号为</p>
+		<div class="order-id">
+			<span id="oid" th:text="${order.id}"></span>
+		</div>
+		<a href="javascript:void(0)" onclick="pay()" class="pay-button">
+			去支付
+			<span class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+            </span>
+		</a>
+	</div>
+</div>
+</body>
+</html>

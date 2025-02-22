@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>商品详情页</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<style>
+		.product-image {
+			width: 400px;
+			height: 400px;
+			object-fit: cover;
+			border-radius: 12px;
+			box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+			transition: transform 0.3s ease;
+		}
+		.product-image:hover {
+			transform: scale(1.08);
+		}
+		.product-details {
+			margin-top: 40px;
+			background: #fff;
+			border-radius: 15px;
+			box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+			border: none;
+		}
+		.panel-heading {
+			background: linear-gradient(135deg, #2193b0, #6dd5ed);
+			color: white;
+			padding: 20px;
+			border-radius: 15px 15px 0 0;
+		}
+		.panel-title {
+			font-size: 24px;
+			font-weight: 600;
+		}
+		.table {
+			margin: 20px 0;
+		}
+		.table th {
+			background-color: #f8f9fa;
+			width: 35%;
+			font-size: 16px;
+			padding: 15px 20px;
+			color: #333;
+			font-weight: 600;
+		}
+		.table td {
+			font-size: 16px;
+			padding: 15px 20px;
+		}
+		.price-original {
+			font-size: 1.1em;
+			color: #999;
+		}
+		.price-discount {
+			color: #e74c3c;
+			font-size: 1.8em;
+			font-weight: bold;
+		}
+		.panel-body {
+			padding: 30px;
+		}
+		.stock-info {
+			color: #27ae60;
+			font-weight: 500;
+		}
+	</style>
+</head>
+<body>
+<!-- 加载header.html -->
+<div th:include="admin/header"></div>
+<br><br><br>
+<div class="container">
+	<div class="panel panel-primary product-details">
+		<div class="panel-heading">
+			<h3 class="panel-title">商品详情</h3>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-6 text-center">
+					<img th:src="${goods.gpicture}" class="product-image">
+				</div>
+				<div class="col-md-6">
+					<div class="table-responsive">
+						<table class="table table-bordered">
+							<tbody>
+							<tr>
+								<th><i class="fas fa-tag"></i> 商品名称</th>
+								<td th:text="${goods.gname}" style="font-size: 1.2em; font-weight: 500;"></td>
+							</tr>
+							<tr>
+								<th><i class="fas fa-yen-sign"></i> 商品原价</th>
+								<td>
+									<del class="price-original" th:text="'¥' + ${goods.goprice}"></del>
+								</td>
+							</tr>
+							<tr>
+								<th><i class="fas fa-percentage"></i> 优惠价格</th>
+								<td>
+									<span class="price-discount" th:text="'¥' + ${goods.grprice}"></span>
+								</td>
+							</tr>
+							<tr>
+								<th><i class="fas fa-warehouse"></i> 库存状态</th>
+								<td>
+									<span class="stock-info" th:text="${goods.gstore + ' 件'}"></span>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

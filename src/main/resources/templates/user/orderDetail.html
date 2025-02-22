@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>订单详情页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<style>
+		.container {
+			padding: 30px 15px;
+			max-width: 1000px;
+		}
+		.order-header {
+			background: #fff;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			margin-bottom: 20px;
+		}
+		.order-id {
+			color: #666;
+			font-size: 14px;
+		}
+		.order-date {
+			color: #999;
+			font-size: 14px;
+		}
+		.order-status {
+			float: right;
+			padding: 5px 15px;
+			border-radius: 15px;
+			background-color: #e8f5e9;
+			color: #4caf50;
+			font-weight: 500;
+		}
+		.product-list {
+			background: #fff;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+		.product-item {
+			display: flex;
+			align-items: center;
+			padding: 20px;
+			border-bottom: 1px solid #eee;
+			transition: all 0.3s ease;
+		}
+		.product-item:last-child {
+			border-bottom: none;
+		}
+		.product-item:hover {
+			background-color: #f8f9fa;
+		}
+		.product-image {
+			width: 100px;
+			height: 100px;
+			object-fit: cover;
+			border-radius: 8px;
+			margin-right: 20px;
+		}
+		.product-info {
+			flex-grow: 1;
+		}
+		.product-name {
+			font-size: 16px;
+			font-weight: 500;
+			color: #333;
+			margin-bottom: 10px;
+		}
+		.product-meta {
+			color: #666;
+			font-size: 14px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.price {
+			color: #e4393c;
+			font-weight: bold;
+		}
+		.quantity {
+			color: #666;
+			background: #f5f5f5;
+			padding: 2px 8px;
+			border-radius: 4px;
+		}
+		.order-summary {
+			background: #fff;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			margin-top: 20px;
+			text-align: right;
+		}
+		.total-amount {
+			font-size: 24px;
+			color: #e4393c;
+			font-weight: bold;
+		}
+		.btn-repurchase {
+			background-color: #e4393c;
+			color: white;
+			padding: 8px 20px;
+			border-radius: 20px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			font-size: 14px;
+			border: none;
+		}
+		.btn-repurchase:hover {
+			background-color: #c1272d;
+			color: white;
+			text-decoration: none;
+		}
+		.section-title {
+			font-size: 18px;
+			font-weight: 500;
+			color: #333;
+			margin-bottom: 20px;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #e4393c;
+		}
+	</style>
+</head>
+<body class="bg-light">
+<div class="container">
+	<!-- 订单头部信息 -->
+	<div class="order-header">
+		<div class="row">
+			<div class="col-md-8">
+				<h4 class="section-title">订单信息</h4>
+				<div class="order-id">
+					订单号：<strong th:text="${order.id}">123456789</strong>
+				</div>
+				<div class="order-date">
+					下单时间：<span th:text="${order.orderdate}">2023-11-04</span>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<span class="order-status">已完成</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- 商品列表 -->
+	<div class="product-list">
+		<h4 class="section-title">商品信息</h4>
+		<div th:each="od : ${orderDetail}" class="product-item">
+			<img th:src="${od.gpicture}" class="product-image" alt="商品图片">
+			<div class="product-info">
+				<div class="product-name" th:text="${od.gname}">商品名称</div>
+				<div class="product-meta">
+					<div>
+						<span class="price">￥<span th:text="${od.grprice}">0.00</span></span>
+						<span class="quantity">x<span th:text="${od.shoppingnum}">1</span></span>
+					</div>
+					<a th:href="'goodsDetail?id=' + ${od.id}" class="btn-repurchase">
+						<i class="glyphicon glyphicon-shopping-cart"></i> 再次购买
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 订单汇总 -->
+	<div class="order-summary">
+		<div class="row">
+			<div class="col-md-12">
+				<span style="font-size: 16px; margin-right: 10px;">订单总金额：</span>
+				<span class="total-amount">￥<span th:text="${order.amount}">0.00</span></span>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

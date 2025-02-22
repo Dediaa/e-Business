@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>查询类型页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<script src="js/jquery.min.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+		function deleteType(tid) {
+			$.ajax({
+				url: [[@{/type/deleteType}]], // 请求路径
+			type: "post",                 // 请求类型
+					data: {                       // 发送的数据
+				id: tid
+			},
+			success: function(obj) {      // 成功响应的结果
+				if(obj == "no") {
+					alert("该类型下有商品不允许删除！");
+				} else {
+					if(window.confirm("真的删除该类型吗？")) {
+						var pathName = window.document.location.pathname;
+						var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+						window.location.href = projectName + obj;
+					}
+				}
+			},
+			error: function() {
+				alert("处理异常！");
+			}
+		});
+		}
+	</script>
+</head>
+<body>
+<!-- 加载header.html -->
+<div th:include="admin/header"></div>
+
+<div class="container" style="margin-top: 3rem;">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">商品类型列表</h3>
+		</div>
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table class="table table-bordered table-hover">
+					<thead>
+					<tr class="text-center">
+						<th>类型ID</th>
+						<th>类型名称</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody class="text-center">
+					<tr th:each="gty:${allTypes}">
+						<td th:text="${gty.id}"></td>
+						<td th:text="${gty.typename}"></td>
+						<td>
+							<a href="javascript:void(0)"
+							   th:onclick="'deleteType(' + ${gty.id} + ')'"
+							   class="btn btn-danger btn-sm">
+								删除
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<nav aria-label="Page navigation" class="text-right">
+								<ul class="pagination">
+									<li><span>第 <span th:text="${currentPage}"></span> 页</span></li>
+									<li><span>共 <span th:text="${totalPage}"></span> 页</span></li>
+									<li th:if="${currentPage} != 1">
+										<a th:href="'type/selectAllTypeByPage?currentPage=' + ${currentPage - 1}"
+										   class="btn btn-default">
+											上一页
+										</a>
+									</li>
+									<li th:if="${currentPage} != ${totalPage}">
+										<a th:href="'type/selectAllTypeByPage?currentPage=' + ${currentPage + 1}"
+										   class="btn btn-default">
+											下一页
+										</a>
+									</li>
+								</ul>
+							</nav>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

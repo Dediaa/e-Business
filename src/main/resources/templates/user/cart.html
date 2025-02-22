@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>购物车页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css"/>
+	<script src="js/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<style>
+		.cart-container {
+			margin-top: 20px;
+			margin-bottom: 100px;
+		}
+		.table th, .table td {
+			vertical-align: middle;
+			text-align: center;
+		}
+		.product-info {
+			text-align: left;
+			font-weight: bold;
+			font-size: 14px;
+			display: flex;
+			align-items: center;
+		}
+		.product-img {
+			height: 70px;
+			width: 70px;
+			margin-right: 15px;
+			border-radius: 4px;
+			object-fit: cover;
+		}
+		.total-container {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			background-color: #fff;
+			box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+			padding: 20px 0;
+			z-index: 1000;
+		}
+
+		.total {
+			font-size: 20px;
+			font-weight: bold;
+			color: #e4393c;
+		}
+
+		.action-buttons a {
+			margin-right: 20px;
+			font-weight: bold;
+			text-decoration: none;
+			transition: all 0.3s ease;
+		}
+
+		.btn-clear {
+			color: #666;
+			padding: 8px 15px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+		}
+
+		.btn-clear:hover {
+			color: #e4393c;
+			border-color: #e4393c;
+		}
+
+		.btn-checkout {
+			background-color: #e4393c;
+			color: white;
+			padding: 10px 30px;
+			border-radius: 4px;
+			font-size: 16px;
+		}
+
+		.btn-checkout:hover {
+			background-color: #c1272d;
+			color: white;
+		}
+
+		.delete-btn {
+			background-color: transparent;
+			color: #e4393c;
+			border: 1px solid #e4393c;
+			padding: 5px 15px;
+			border-radius: 20px;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			font-size: 13px;
+		}
+
+		.delete-btn:hover {
+			background-color: #e4393c;
+			color: white;
+			text-decoration: none;
+		}
+
+		.btn-clear {
+			background-color: #fff;
+			color: #666;
+			border: 1px solid #ddd;
+			padding: 8px 20px;
+			border-radius: 20px;
+			transition: all 0.3s ease;
+			margin-right: 15px;
+		}
+
+		.btn-clear:hover {
+			border-color: #e4393c;
+			color: #e4393c;
+		}
+
+		.btn-checkout {
+			background-color: #e4393c;
+			color: white;
+			padding: 10px 30px;
+			border-radius: 20px;
+			transition: all 0.3s ease;
+		}
+
+		.btn-checkout:hover {
+			background-color: #c1272d;
+			color: white;
+			text-decoration: none;
+		}
+
+		.empty-cart {
+			text-align: center;
+			padding: 50px 0;
+			color: #999;
+		}
+
+		.empty-cart i {
+			font-size: 48px;
+			margin-bottom: 20px;
+		}
+	</style>
+	<script type="text/javascript">
+		function deleteCart(obj) {
+			Swal.fire({
+				title: '确认删除',
+				text: "确定要删除这个商品吗？",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#e4393c',
+				cancelButtonColor: '#6c757d',
+				confirmButtonText: '确定删除',
+				cancelButtonText: '取消'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					var projectName = window.location.pathname.substring(0, window.location.pathname.substr(1).indexOf('/') + 1);
+					window.location.href = projectName + "/cart/deleteCart?gid=" + obj;
+				}
+			});
+		}
+
+		function clearCart() {
+			Swal.fire({
+				title: '清空购物车',
+				text: "确定要清空购物车吗？此操作不可恢复！",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#e4393c',
+				cancelButtonColor: '#6c757d',
+				confirmButtonText: '确定清空',
+				cancelButtonText: '取消'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					var projectName = window.location.pathname.substring(0, window.location.pathname.substr(1).indexOf('/') + 1);
+					window.location.href = projectName + "/cart/clearCart";
+				}
+			});
+		}
+	</script>
+</head>
+<body>
+<div th:include="user/header"></div>
+<div class="container cart-container">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">购物车列表</h3>
+		</div>
+		<div class="panel-body">
+			<div th:if="${#lists.isEmpty(cartlist)}" class="empty-cart">
+				<i class="glyphicon glyphicon-shopping-cart"></i>
+				<h4>购物车还是空的哦~</h4>
+				<p>快去添加商品吧！</p>
+				<a th:href="@{/}" class="btn btn-primary">去购物</a>
+			</div>
+			
+			<table th:if="${not #lists.isEmpty(cartlist)}" class="table table-bordered table-hover">
+				<thead>
+				<tr>
+					<th>商品信息</th>
+					<th>单价（元）</th>
+					<th>数量</th>
+					<th>小计</th>
+					<th>操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr th:each="cart:${cartlist}">
+					<td class="product-info">
+						<a th:href="'goodsDetail?id=' + ${cart.id}">
+							<img th:src="${cart.gpicture}" class="product-img">
+							<span th:text="${cart.gname}"></span>
+						</a>
+					</td>
+					<td th:text="${cart.grprice}"></td>
+					<td th:text="${cart.shoppingnum}"></td>
+					<td th:text="${cart.smallsum}"></td>
+					<td>
+						<a href="javascript:void(0);" th:onclick="'deleteCart(' + ${cart.id} + ')'" class="delete-btn">
+							<i class="glyphicon glyphicon-trash"></i> 删除
+						</a>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div th:if="${not #lists.isEmpty(cartlist)}" class="total-container">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 text-left">
+				<span class="total">购物金额总计(不含运费)：￥<span th:text="${total}"></span> 元</span>
+			</div>
+			<div class="col-md-6 text-right">
+				<a href="javascript:void(0);" onclick="clearCart()" class="btn-clear">
+					<i class="glyphicon glyphicon-trash"></i> 清空购物车
+				</a>
+				<a href="cart/selectCart?act=toCount" class="btn-checkout">
+					<i class="glyphicon glyphicon-shopping-cart"></i> 去结算
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

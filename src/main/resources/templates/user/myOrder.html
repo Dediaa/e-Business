@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<base th:href="@{/}">
+	<meta charset="UTF-8">
+	<title>订单页面</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<script src="js/jquery.min.js"></script>
+	<style>
+		.container {
+			margin-top: 30px;
+		}
+		.panel-primary {
+			box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		}
+		.panel-heading {
+			background: linear-gradient(to right, #4a90e2, #357abd) !important;
+			padding: 15px !important;
+		}
+		.panel-title {
+			color: white;
+			font-size: 20px;
+			font-weight: 500;
+		}
+		.table {
+			margin-top: 15px;
+		}
+		.table th {
+			background-color: #f8f9fa;
+			color: #333;
+			font-weight: 600;
+			text-align: center;
+		}
+		.table td {
+			vertical-align: middle !important;
+		}
+		.btn-pay {
+			background-color: #28a745;
+			color: white;
+			padding: 5px 15px;
+			border-radius: 4px;
+			text-decoration: none;
+			transition: background-color 0.3s;
+		}
+		.btn-pay:hover {
+			background-color: #218838;
+			color: white;
+			text-decoration: none;
+		}
+		.btn-detail {
+			color: #4a90e2;
+			text-decoration: none;
+			transition: color 0.3s;
+		}
+		.btn-detail:hover {
+			color: #357abd;
+			text-decoration: underline;
+		}
+	</style>
+	<script type="text/javascript" th:inline="javascript">
+		function pay(orderId){
+			$.ajax({
+				url : [[@{/cart/pay}]],
+			type : "post",
+					contentType : "application/json",
+					data : JSON.stringify({
+				id : orderId
+			}),
+					success : function(obj){
+				Swal.fire({
+					icon: 'success',
+					title: '支付成功',
+					showConfirmButton: false,
+					timer: 1500
+				});
+				var pathName = window.document.location.pathname;
+				var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+				setTimeout(function() {
+					window.location.href = projectName;
+				}, 1500);
+			},
+			error : function() {
+				Swal.fire({
+					icon: 'error',
+					title: '处理异常',
+					text: '请稍后重试'
+				});
+			}
+		}
+		);
+		}
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<div th:include="user/header"></div>
+<div class="container">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">订单列表</h3>
+		</div>
+		<div class="panel-body">
+			<div class="table table-responsive">
+				<table class="table table-bordered table-hover">
+					<tbody>
+					<tr>
+						<th>订单编号</th>
+						<th>订单金额</th>
+						<th>订单状态</th>
+						<th>下单时间</th>
+						<th>查看详情</th>
+					</tr>
+					<tr th:each="order:${myOrder}">
+						<td th:text="${order.id}"></td>
+						<td th:text="'¥' + ${order.amount}"></td>
+						<td>
+								<span th:if="${order.status} == 0" >
+									未支付 &nbsp; <a th:href="'javascript:pay(\'' + ${order.id} + '\')'" class="btn-pay">去支付</a>
+								</span>
+							<span th:if="${order.status} == 1" class="text-success">
+									已支付
+								</span>
+						</td>
+						<td th:text="${order.orderdate}"></td>
+						<td>
+							<a th:href="'cart/orderDetail?id=' + ${order.id}" target="_blank" class="btn-detail">查看详情</a>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

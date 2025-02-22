@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>商品类型添加页面</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<style>
+		body {
+			padding-top: 50px;
+			background-color: #f8f9fa;
+			font-family: 'Microsoft YaHei', sans-serif;
+		}
+		.container {
+			max-width: 800px;
+			background: #ffffff;
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+			margin-top: 20px;
+		}
+		h3 {
+			margin: 0;
+			padding: 20px;
+			color: #ffffff;
+			font-weight: 600;
+			letter-spacing: 1px;
+		}
+		.bg-primary {
+			border-radius: 12px 12px 0 0;
+			background: linear-gradient(135deg, #007bff, #0056b3);
+		}
+		.form-group {
+			margin-bottom: 25px;
+		}
+		.form-group label {
+			font-weight: 600;
+			color: #333;
+		}
+		.form-control {
+			border-radius: 6px;
+			border: 1px solid #ddd;
+			padding: 10px 15px;
+			transition: all 0.3s ease;
+		}
+		.form-control:focus {
+			border-color: #007bff;
+			box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+		}
+		.btn-success, .btn-primary {
+			width: 120px;
+			padding: 10px;
+			border-radius: 6px;
+			font-weight: 600;
+			transition: all 0.3s ease;
+			margin: 0 10px;
+		}
+		.btn-success:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+		}
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+		}
+		.custom-upload-btn {
+			display: inline-block;
+			background: linear-gradient(135deg, #007bff, #0056b3);
+			color: white;
+			padding: 12px 24px;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-weight: 600;
+		}
+		.custom-upload-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+		}
+		#fileUpload {
+			display: none;
+		}
+		#imagePreview {
+			margin-top: 15px;
+			max-width: 200px;
+			max-height: 200px;
+			border-radius: 8px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+		}
+		.has-success .form-control {
+			border-color: #28a745;
+		}
+		.has-success .control-label {
+			color: #28a745;
+		}
+	</style>
+</head>
+<body>
+<div th:include="admin/header"></div>
+<br><br><br>
+<div class="container">
+	<div class="bg-primary text-center">
+		<h3>添加商品</h3>
+	</div>
+	<br>
+	<form th:action="@{/goods/addGoods?act=add}" name="myform" method="post" th:object="${goods}" class="form-horizontal" enctype="multipart/form-data">
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品名称</label>
+			<div class="col-sm-4 col-md-4">
+				<input type="text" class="form-control" placeholder="请输入商品名" th:field="*{gname}" />
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品原价</label>
+			<div class="col-sm-4 col-md-4">
+				<input type="number" class="form-control" placeholder="请输入商品原价" th:field="*{goprice}" />
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品折扣价</label>
+			<div class="col-sm-4 col-md-4">
+				<input type="number" class="form-control" placeholder="请输入商品折扣价" th:field="*{grprice}" />
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品库存</label>
+			<div class="col-sm-4 col-md-4">
+				<input type="number" class="form-control" placeholder="请输入商品库存" th:field="*{gstore}" />
+			</div>
+		</div>
+		<!-- 自定义文件上传及预览 -->
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品图片</label>
+			<div class="col-sm-4 col-md-4">
+				<span class="custom-upload-btn" onclick="document.getElementById('fileUpload').click()">选择图片</span>
+				<input type="file" id="fileUpload" name="fileName" accept="image/*"/>
+				<img id="imagePreview" src="#" alt="商品图片预览" style="display: none;"/>
+				<input type="hidden" th:field="*{gpicture}" id="imageUrl"/>
+			</div>
+		</div>
+		<div class="form-group has-success">
+			<label class="col-sm-2 col-md-2 control-label">商品类型</label>
+			<div class="col-sm-4 col-md-4">
+				<select class="form-control" th:field="*{goodstype_id}">
+					<option th:each="gty : ${goodsType}" th:value="${gty.id}" th:text="${gty.typename}"></option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-success">添加</button>
+				<button type="reset" class="btn btn-primary">重置</button>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+<script type="text/javascript" th:inline="javascript">
+	$(document).ready(function() {
+		$('#fileUpload').change(function() {
+			var formData = new FormData();
+			formData.append("file", this.files[0]);
+
+			$.ajax({
+				url: [[@{/common/upload}]],
+			type: "POST",
+					data: formData,
+					processData: false,
+					contentType: false,
+					success: function(response) {
+				if (response.code === 200) {
+					$('#imagePreview').attr("src", response.url).show();
+					$('#imageUrl').val(response.url);
+				} else {
+					alert("图片上传失败: " + response.message);
+				}
+			},
+			error: function(xhr, status, error) {
+				alert("上传过程中出错，请稍后重试。");
+			}
+		});
+		});
+	});
+</script>
+</html>
